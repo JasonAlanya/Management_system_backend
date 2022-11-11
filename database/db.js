@@ -1,5 +1,4 @@
 import { createPool } from "mysql2/promise";
-import "dotenv/config";
 
 //Main data to access the database
 export const pool = createPool({
