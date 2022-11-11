@@ -17,7 +17,7 @@ console.log("The server is in the PORT: ", PORT);*/
 
 app.get("/", (req, res) => {
   console.log("Petición recibida");
-  res.status(200).send("<h1>Hola mundo<h1>");
+  res.status(200).send("<h1>Hola mundo nuevo<h1>");
 });
 
 app.listen(PORT, () => {
