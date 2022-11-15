@@ -3,7 +3,9 @@ import { pool } from "../database/db.js";
 //Get products quantity from the db
 export const getOrdersQuantity = async (req, res) => {
   try {
-    const [result] = await pool.query("SELECT COUNT(*) FROM orders;");
+    const [result] = await pool.query(
+      "SELECT COUNT(*) AS counter FROM orders;"
+    );
     res.json(result);
   } catch (error) {
     return res.status(500).json({ message: error.message });
