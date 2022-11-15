@@ -6,6 +6,7 @@ import {
   updateOrder,
   deleteOrder,
   getOrdersPagination,
+  getOrdersQuantity,
 } from "../controllers/orders.controllers.js";
 
 import {
@@ -15,6 +16,7 @@ import {
   updateProducts,
   deleteProducts,
   getProductsPagination,
+  getProductsQuantity,
 } from "../controllers/products.controllers.js";
 
 import {
@@ -27,6 +29,8 @@ import {
 const router = Router();
 
 //Routes for orders
+router.get("/ordersquantity", getOrdersQuantity);
+
 router.get("/orders", getOrders);
 
 router.get("/orderspagination", getOrdersPagination);
@@ -40,6 +44,8 @@ router.put("/orders/:id", updateOrder);
 router.delete("/orders/:id", deleteOrder);
 
 //Routes for products
+router.get("/productsquantity", getProductsQuantity);
+
 router.get("/products", getProducts);
 
 router.get("/productspagination", getProductsPagination);
