@@ -12,6 +12,20 @@ export const getProducts = async (req, res) => {
   }
 };
 
+//Get multiple products by pagination from the db
+export const getProductsPagination = async (req, res) => {
+  try {
+    const { initial_post, post_per_page } = req.body;
+    const [result] = await pool.query(
+      "SELECT product.*,CONCAT(category.name) as category FROM category INNER JOIN product ON product.id_category=category.id ORDER BY id ASC LIMIT ?,?",
+      [initial_post, post_per_page]
+    );
+    res.json(result);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 //Get one product from the db
 export const getProduct = async (req, res) => {
   try {

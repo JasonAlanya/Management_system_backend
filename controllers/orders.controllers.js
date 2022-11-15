@@ -9,6 +9,19 @@ export const getOrders = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+//Get multiple orders from the db
+export const getOrdersPagination = async (req, res) => {
+  try {
+    const { initial_post, post_per_page } = req.body;
+    const [result] = await pool.query(
+      "SELECT * FROM orders ORDER BY id ASC LIMIT ?,?",
+      [initial_post, post_per_page]
+    );
+    res.json(result);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 //Get one order from the db
 export const getOrder = async (req, res) => {
