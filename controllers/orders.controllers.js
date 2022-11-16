@@ -12,6 +12,19 @@ export const getOrdersQuantity = async (req, res) => {
   }
 };
 
+export const getOrdersQuantity_withSearcher = async (req, res) => {
+  try {
+    const [result] = await pool.query(
+      `SELECT COUNT(*) AS counter FROM orders WHERE orders.customer LIKE '%${String(
+        req.params.set_searcher
+      )}%'`
+    );
+    res.json(result);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 //Get multiple orders from the db
 export const getOrders = async (req, res) => {
   try {
@@ -21,11 +34,29 @@ export const getOrders = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-//Get multiple orders from the db
+//Get multiple orders by pagination from the db
 export const getOrdersPagination = async (req, res) => {
   try {
     const [result] = await pool.query(
-      "SELECT * FROM orders ORDER BY id ASC LIMIT ?,?",
+      `SELECT * FROM orders ORDER BY ${String(
+        req.params.set_searcher_by
+      )} ${String(req.params.set_searcher_by_ad)} LIMIT ?,?`,
+      [Number(req.params.initial_post), Number(req.params.post_per_page)]
+    );
+    res.json(result);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+export const getOrdersPagination_withSearcher = async (req, res) => {
+  try {
+    const [result] = await pool.query(
+      `SELECT * FROM orders WHERE orders.customer LIKE '%${String(
+        req.params.set_searcher
+      )}%' ORDER BY ${String(req.params.set_searcher_by)} ${String(
+        req.params.set_searcher_by_ad
+      )} LIMIT ?,?`,
       [Number(req.params.initial_post), Number(req.params.post_per_page)]
     );
     res.json(result);

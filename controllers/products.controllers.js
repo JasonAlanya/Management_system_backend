@@ -4,7 +4,20 @@ import { pool } from "../database/db.js";
 export const getProductsQuantity = async (req, res) => {
   try {
     const [result] = await pool.query(
-      "SELECT COUNT(*) AS counter FROM product;"
+      "SELECT COUNT(*) AS counter FROM product"
+    );
+    res.json(result);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+export const getProductsQuantity_withSearcher = async (req, res) => {
+  try {
+    const [result] = await pool.query(
+      `SELECT COUNT(*) AS counter FROM product WHERE product.name LIKE '%${String(
+        req.params.set_searcher
+      )}%'`
     );
     res.json(result);
   } catch (error) {
@@ -28,7 +41,25 @@ export const getProducts = async (req, res) => {
 export const getProductsPagination = async (req, res) => {
   try {
     const [result] = await pool.query(
-      "SELECT product.*,CONCAT(category.name) as category FROM category INNER JOIN product ON product.id_category=category.id ORDER BY id ASC LIMIT ?,?",
+      `SELECT product.*,CONCAT(category.name) as category FROM category INNER JOIN product ON product.id_category=category.id ORDER BY ${String(
+        req.params.set_searcher_by
+      )} ${String(req.params.set_searcher_by_ad)} LIMIT ?,?`,
+      [Number(req.params.initial_post), Number(req.params.post_per_page)]
+    );
+    res.json(result);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+export const getProductsPagination_withSearcher = async (req, res) => {
+  try {
+    const [result] = await pool.query(
+      `SELECT product.*,CONCAT(category.name) as category FROM category INNER JOIN product ON product.id_category=category.id WHERE product.name LIKE '%${String(
+        req.params.set_searcher
+      )}%' ORDER BY ${String(req.params.set_searcher_by)} ${String(
+        req.params.set_searcher_by_ad
+      )}  LIMIT ?,?`,
       [Number(req.params.initial_post), Number(req.params.post_per_page)]
     );
     res.json(result);
