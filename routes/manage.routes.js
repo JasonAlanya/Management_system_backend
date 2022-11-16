@@ -33,7 +33,10 @@ router.get("/ordersquantity", getOrdersQuantity);
 
 router.get("/orders", getOrders);
 
-router.get("/orderspagination", getOrdersPagination);
+router.get(
+  "/orderspagination/:initial_post&:post_per_page",
+  getOrdersPagination
+);
 
 router.get("/orders/:id", getOrder);
 
@@ -48,7 +51,10 @@ router.get("/productsquantity", getProductsQuantity);
 
 router.get("/products", getProducts);
 
-router.get("/productspagination", getProductsPagination);
+router.get(
+  "/productspagination/:initial_post&:post_per_page",
+  getProductsPagination
+);
 
 router.get("/products/:id", getProduct);
 

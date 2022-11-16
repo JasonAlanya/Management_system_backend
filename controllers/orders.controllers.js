@@ -24,10 +24,9 @@ export const getOrders = async (req, res) => {
 //Get multiple orders from the db
 export const getOrdersPagination = async (req, res) => {
   try {
-    const { initial_post, post_per_page } = req.body;
     const [result] = await pool.query(
       "SELECT * FROM orders ORDER BY id ASC LIMIT ?,?",
-      [initial_post, post_per_page]
+      [Number(req.params.initial_post), Number(req.params.post_per_page)]
     );
     res.json(result);
   } catch (error) {
