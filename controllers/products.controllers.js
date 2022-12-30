@@ -3,23 +3,17 @@ import { pool } from "../database/db.js";
 //Get products quantity from the db
 export const getProductsQuantity = async (req, res) => {
   try {
-    const [result] = await pool.query(
-      "SELECT COUNT(*) AS counter FROM product"
-    );
-    res.json(result);
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
-};
-
-export const getProductsQuantity_withSearcher = async (req, res) => {
-  try {
-    const [result] = await pool.query(
-      `SELECT COUNT(*) AS counter FROM product WHERE product.name LIKE '%${String(
-        req.params.set_searcher
-      )}%'`
-    );
-    res.json(result);
+    if (req.query.search === "" || req.query.search === undefined) {
+      const [result] = await pool.query(
+        "SELECT COUNT(*) AS counter FROM product"
+      );
+      res.json(result);
+    } else {
+      const [result] = await pool.query(
+        `SELECT COUNT(*) AS counter FROM product WHERE product.name LIKE '%${req.query.search}%'`
+      );
+      res.json(result);
+    }
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -28,41 +22,39 @@ export const getProductsQuantity_withSearcher = async (req, res) => {
 //Get multiple products from the db
 export const getProducts = async (req, res) => {
   try {
-    const [result] = await pool.query(
-      "SELECT product.*,CONCAT(category.name) as category FROM category INNER JOIN product ON product.id_category=category.id ORDER BY id ASC"
-    );
-    res.json(result);
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
-};
-
-//Get multiple products by pagination from the db
-export const getProductsPagination = async (req, res) => {
-  try {
-    const [result] = await pool.query(
-      `SELECT product.*,CONCAT(category.name) as category FROM category INNER JOIN product ON product.id_category=category.id ORDER BY ${String(
-        req.params.set_searcher_by
-      )} ${String(req.params.set_searcher_by_ad)} LIMIT ?,?`,
-      [Number(req.params.initial_post), Number(req.params.post_per_page)]
-    );
-    res.json(result);
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
-};
-
-export const getProductsPagination_withSearcher = async (req, res) => {
-  try {
-    const [result] = await pool.query(
-      `SELECT product.*,CONCAT(category.name) as category FROM category INNER JOIN product ON product.id_category=category.id WHERE product.name LIKE '%${String(
-        req.params.set_searcher
-      )}%' ORDER BY ${String(req.params.set_searcher_by)} ${String(
-        req.params.set_searcher_by_ad
-      )}  LIMIT ?,?`,
-      [Number(req.params.initial_post), Number(req.params.post_per_page)]
-    );
-    res.json(result);
+    if (
+      (req.query.search === "" || req.query.search === undefined) &&
+      (req.query.orderSearchBy === "" ||
+        req.query.orderSearchBy === undefined) &&
+      (req.query.orderSearch === "" || req.query.orderSearch === undefined) &&
+      (req.query.initialPost === "" || req.query.initialPost === undefined) &&
+      (req.query.postsPerPage === "" || req.query.postsPerPage === undefined)
+    ) {
+      const [result] = await pool.query(
+        "SELECT product.*,CONCAT(category.name) as category FROM category INNER JOIN product ON product.id_category=category.id ORDER BY id ASC"
+      );
+      res.json(result);
+    } else if (req.query.search === "" || req.query.search === undefined) {
+      const [result] = await pool.query(
+        `SELECT product.*,CONCAT(category.name) as category FROM category INNER JOIN product ON product.id_category=category.id ORDER BY ${
+          req.query.orderSearchBy
+        } ${req.query.orderSearch} LIMIT ${Number(
+          req.query.initialPost
+        )},${Number(req.query.postsPerPage)}`
+      );
+      res.json(result);
+    } else {
+      const [result] = await pool.query(
+        `SELECT product.*,CONCAT(category.name) as category FROM category INNER JOIN product ON product.id_category=category.id WHERE product.name LIKE '%${
+          req.query.search
+        }%' ORDER BY ${req.query.orderSearchBy} ${
+          req.query.orderSearch
+        }  LIMIT ${Number(req.query.initialPost)},${Number(
+          req.query.postsPerPage
+        )}`
+      );
+      res.json(result);
+    }
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

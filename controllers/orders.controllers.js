@@ -3,63 +3,57 @@ import { pool } from "../database/db.js";
 //Get products quantity from the db
 export const getOrdersQuantity = async (req, res) => {
   try {
-    const [result] = await pool.query(
-      "SELECT COUNT(*) AS counter FROM orders;"
-    );
-    res.json(result);
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
-};
-
-export const getOrdersQuantity_withSearcher = async (req, res) => {
-  try {
-    const [result] = await pool.query(
-      `SELECT COUNT(*) AS counter FROM orders WHERE orders.customer LIKE '%${String(
-        req.params.set_searcher
-      )}%'`
-    );
-    res.json(result);
+    if (req.query.search === "" || req.query.search === undefined) {
+      const [result] = await pool.query(
+        "SELECT COUNT(*) AS counter FROM orders;"
+      );
+      res.json(result);
+    } else {
+      const [result] = await pool.query(
+        `SELECT COUNT(*) AS counter FROM orders WHERE orders.customer LIKE '%${req.query.search}%'`
+      );
+      res.json(result);
+    }
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 };
 
 //Get multiple orders from the db
+
 export const getOrders = async (req, res) => {
   try {
-    const [result] = await pool.query("SELECT * FROM orders ORDER BY id ASC");
-    res.json(result);
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
-};
-//Get multiple orders by pagination from the db
-export const getOrdersPagination = async (req, res) => {
-  try {
-    const [result] = await pool.query(
-      `SELECT * FROM orders ORDER BY ${String(
-        req.params.set_searcher_by
-      )} ${String(req.params.set_searcher_by_ad)} LIMIT ?,?`,
-      [Number(req.params.initial_post), Number(req.params.post_per_page)]
-    );
-    res.json(result);
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
-};
-
-export const getOrdersPagination_withSearcher = async (req, res) => {
-  try {
-    const [result] = await pool.query(
-      `SELECT * FROM orders WHERE orders.customer LIKE '%${String(
-        req.params.set_searcher
-      )}%' ORDER BY ${String(req.params.set_searcher_by)} ${String(
-        req.params.set_searcher_by_ad
-      )} LIMIT ?,?`,
-      [Number(req.params.initial_post), Number(req.params.post_per_page)]
-    );
-    res.json(result);
+    if (
+      (req.query.search === "" || req.query.search === undefined) &&
+      (req.query.orderSearchBy === "" ||
+        req.query.orderSearchBy === undefined) &&
+      (req.query.orderSearch === "" || req.query.orderSearch === undefined) &&
+      (req.query.initialPost === "" || req.query.initialPost === undefined) &&
+      (req.query.postsPerPage === "" || req.query.postsPerPage === undefined)
+    ) {
+      const [result] = await pool.query("SELECT * FROM orders ORDER BY id ASC");
+      res.json(result);
+    } else if (req.query.search === "" || req.query.search === undefined) {
+      const [result] = await pool.query(
+        `SELECT * FROM orders ORDER BY ${req.query.orderSearchBy} ${
+          req.query.orderSearch
+        } LIMIT ${Number(req.query.initialPost)},${Number(
+          req.query.postsPerPage
+        )}`
+      );
+      res.json(result);
+    } else {
+      const [result] = await pool.query(
+        `SELECT * FROM orders WHERE orders.customer LIKE '%${
+          req.query.search
+        }%' ORDER BY ${req.query.orderSearchBy} ${
+          req.query.orderSearch
+        } LIMIT ${Number(req.query.initialPost)},${Number(
+          req.query.postsPerPage
+        )}`
+      );
+      res.json(result);
+    }
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
